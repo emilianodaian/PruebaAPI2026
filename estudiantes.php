@@ -41,13 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nombre = $_POST['nombre'];
     $apellido = $_POST['apellido'];
-    $correo = $_POST['correo'];
+    $correo = $_POST['dni'];
 
-    $sql = "INSERT INTO estudiantes (nombre, apellido, correo) VALUES (:nombre, :apellido, :correo)";
+    $sql = "INSERT INTO estudiantes (nombre, apellido, correo) VALUES (:nombre, :apellido, :dni)";
     $stmt = $conexion->prepare($sql);
     $stmt->bindParam(':nombre', $nombre);
     $stmt->bindParam(':apellido', $apellido);
-    $stmt->bindParam(':correo', $correo);
+    $stmt->bindParam(':correo', $dni);
     $stmt->execute();
 
     header('Location: index.php');

@@ -39,15 +39,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre = $_POST['nombre'];
-    $apellido = $_POST['apellido'];
+    $nombre = $_POST['nombres'];
+    $apellido = $_POST['apellidos'];
     $correo = $_POST['dni'];
 
     $sql = "INSERT INTO estudiantes (nombre, apellido, correo) VALUES (:nombre, :apellido, :dni)";
     $stmt = $conexion->prepare($sql);
-    $stmt->bindParam(':nombre', $nombre);
-    $stmt->bindParam(':apellido', $apellido);
-    $stmt->bindParam(':correo', $dni);
+    $stmt->bindParam(':nombres', $nombres);
+    $stmt->bindParam(':apellidos', $apellidos);
+    $stmt->bindParam(':dni', $dni);
     $stmt->execute();
 
     header('Location: index.php');

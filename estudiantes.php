@@ -39,18 +39,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre = $_POST['nombres'];
-    $apellido = $_POST['apellidos'];
-    $correo = $_POST['dni'];
 
-    $sql = "INSERT INTO estudiantes (nombre, apellido, correo) VALUES (:nombre, :apellido, :dni)";
+    $json = file_get_contents('php://input');
+    
+    $datos = json_decode($json, true);
+
+    $nombres = $datos['nombres'];
+    $apellidos = $datos['apellidos'];
+    $dni = $datos['dni'];
+
+    $sql = "INSERT INTO estudiantes (nombres, apellidos, dni) VALUES (:nombres, :apellidos, :dni)";
     $stmt = $conexion->prepare($sql);
+    
     $stmt->bindParam(':nombres', $nombres);
     $stmt->bindParam(':apellidos', $apellidos);
     $stmt->bindParam(':dni', $dni);
+    
     $stmt->execute();
 
-    header('Location: index.php');
+    header("HTTP/1.1 201 Created");
+    echo json_encode(["mensaje" => "Estudiante creado con éxito"]);
     exit;
 }
 ?>

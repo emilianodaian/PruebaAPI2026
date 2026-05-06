@@ -61,4 +61,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode(["mensaje" => "Estudiante creado con éxito"]);
     exit;
 }
+
+if($_SERVER['REQUEST_METHOD'] == 'PUT'){
+        // Obtener los datos enviados mediante la solicitud PUT
+        $data = json_decode(file_get_contents("php://input"), true);
+        
+        // Verificar si se proporciona un ID de carrera y al menos el campo 'carNombre'
+        if (isset($data['id']) && isset($data['nombres'])) {
+            $id = $data['id'];
+            $nombres = $data['nombres'];
+        
+            // Construir la consulta SQL para actualizar el nombre de la carrera
+            $sql = "UPDATE estudiantes SET nombres = :nombres WHERE id = :id";
+        
+            // Preparar la consulta
+            $stmt = $pdo->prepare($sql);
+        
+            // Vincular los valores y ejecutar la consulta
+            $stmt->bindParam(':nombres', $nombres);
+            $stmt->bindParam(':id', $id);
+        
+            // Ejecutar la consulta
+            try {
+                $stmt->execute();
+                echo json_encode(array("mensaje" => "Actualización exitosa"));
+            } catch (PDOException $e) {
+                echo json_encode(array("error" => "Error al actualizar: " . $e->getMessage()));
+            }
+        } else {
+            echo json_encode(array("error" => "Se requiere un ID de carrera y el campo 'carNombre'"));
+        }
+        
+        // Cerrar la conexión
+        $pdo = null;
+            }
+
+    if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
+        $sql="DELETE FROM carreras WHERE idCarreras=:id";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':id', $_GET['id']);
+        $stmt->execute();       
+        header("HTTP/1.1 200 OK");
+        exit;
+    }
+    
 ?>

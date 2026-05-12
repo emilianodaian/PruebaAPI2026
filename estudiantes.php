@@ -97,7 +97,7 @@ if($_SERVER['REQUEST_METHOD'] == 'PUT'){
             }
 
     if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
-        $sql="DELETE FROM carreras WHERE idCarreras=:id";
+        $sql="DELETE FROM estudiantes WHERE id=:id";
 
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':id', $_GET['id']);

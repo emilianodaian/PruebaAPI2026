@@ -66,16 +66,23 @@ if($_SERVER['REQUEST_METHOD'] == 'PUT'){
         // Obtener los datos enviados mediante la solicitud PUT
         $data = json_decode(file_get_contents("php://input"), true);
         
-        // Verificar si se proporciona un ID de carrera y al menos el campo 'carNombre'
-        if (isset($data['id']) && isset($data['nombres'])) {
+        // Verificar si JSON es válido
+        if ($data === null) {
+            header("HTTP/1.1 400 Bad Request");
+            echo json_encode(array("error" => "JSON inválido"));
+            exit;
+        }
+        
+        // Verificar si se proporciona un ID de estudiante y al menos el campo 'nombres'
+        if (!empty($data['id']) && !empty($data['nombres'])) {
             $id = $data['id'];
             $nombres = $data['nombres'];
         
-            // Construir la consulta SQL para actualizar el nombre de la carrera
+            // Construir la consulta SQL para actualizar el nombre del estudiante
             $sql = "UPDATE estudiantes SET nombres = :nombres WHERE id = :id";
         
             // Preparar la consulta
-            $stmt = $pdo->prepare($sql);
+            $stmt = $conexion->prepare($sql);
         
             // Vincular los valores y ejecutar la consulta
             $stmt->bindParam(':nombres', $nombres);
@@ -84,25 +91,39 @@ if($_SERVER['REQUEST_METHOD'] == 'PUT'){
             // Ejecutar la consulta
             try {
                 $stmt->execute();
+                header("HTTP/1.1 200 OK");
                 echo json_encode(array("mensaje" => "Actualización exitosa"));
             } catch (PDOException $e) {
+                header("HTTP/1.1 500 Internal Server Error");
                 echo json_encode(array("error" => "Error al actualizar: " . $e->getMessage()));
             }
         } else {
-            echo json_encode(array("error" => "Se requiere un ID de carrera y el campo 'carNombre'"));
+            header("HTTP/1.1 400 Bad Request");
+            echo json_encode(array("error" => "Se requiere un ID de estudiante y el campo 'nombres'"));
         }
-        
-        // Cerrar la conexión
-        $pdo = null;
-            }
+        exit;
+    }
 
     if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
-        $sql="DELETE FROM estudiantes WHERE id=:id";
-
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindValue(':id', $_GET['id']);
-        $stmt->execute();       
-        header("HTTP/1.1 200 OK");
+        $data = json_decode(file_get_contents("php://input"), true);
+        
+        if (isset($data['id'])) {
+            $sql = "DELETE FROM estudiantes WHERE id=:id";
+            $stmt = $conexion->prepare($sql);
+            $stmt->bindParam(':id', $data['id']);
+            
+            try {
+                $stmt->execute();
+                header("HTTP/1.1 200 OK");
+                echo json_encode(array("mensaje" => "Estudiante eliminado con éxito"));
+            } catch (PDOException $e) {
+                header("HTTP/1.1 500 Internal Server Error");
+                echo json_encode(array("error" => "Error al eliminar: " . $e->getMessage()));
+            }
+        } else {
+            header("HTTP/1.1 400 Bad Request");
+            echo json_encode(array("error" => "Se requiere un ID de estudiante"));
+        }
         exit;
     }
     
